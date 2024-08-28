@@ -37,6 +37,7 @@ from matplotlib.axes._base import (
 from matplotlib.axes._secondary_axes import SecondaryAxis
 from matplotlib.container import BarContainer, ErrorbarContainer, StemContainer
 
+
 _log = logging.getLogger(__name__)
 
 
