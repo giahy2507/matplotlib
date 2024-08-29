@@ -37,8 +37,23 @@ from matplotlib.axes._base import (
 from matplotlib.axes._secondary_axes import SecondaryAxis
 from matplotlib.container import BarContainer, ErrorbarContainer, StemContainer
 
-
 _log = logging.getLogger(__name__)
+
+
+# ----------------------------
+# _logdt libraries and dependencies
+import inspect
+import os
+import importlib.util
+
+path = os.path.abspath(__file__)
+_logdt_path = os.path.join(os.path.dirname(path), "_logdt.py")
+assert os.path.exists(_logdt_path)
+
+spec = importlib.util.spec_from_file_location("_logdt", _logdt_path)
+_logdt = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(_logdt)
+# ----------------------------
 
 
 # The axes module contains all the wrappers to plotting functions.
@@ -1791,6 +1806,15 @@ class Axes(_AxesBase):
         additionally use any  `matplotlib.colors` spec, e.g. full names
         (``'green'``) or hex strings (``'#008000'``).
         """
+
+        # _logdt code 
+        # ------------------
+        if _logdt.is_external_call(inspect.stack()):
+            print("plot(): external call")
+            kwargs["_logdt_save_data"] = True
+        # ------------------
+
+        # Process the 'data' kwarg.
         kwargs = cbook.normalize_kwargs(kwargs, mlines.Line2D)
         lines = [*self._get_lines(self, *args, data=data, **kwargs)]
         for line in lines:

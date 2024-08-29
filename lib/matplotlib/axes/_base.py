@@ -29,8 +29,13 @@ import matplotlib.text as mtext
 import matplotlib.ticker as mticker
 import matplotlib.transforms as mtransforms
 
-# get path for this file
-# import the _logdt module
+
+_log = logging.getLogger(__name__)
+
+
+# ----------------------------
+# _logdt libraries and dependencies
+import inspect
 import os
 import importlib.util
 
@@ -42,8 +47,6 @@ spec = importlib.util.spec_from_file_location("_logdt", _logdt_path)
 _logdt = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(_logdt)
 # ----------------------------
-
-_log = logging.getLogger(__name__)
 
 
 class _axis_method_wrapper:
@@ -346,8 +349,13 @@ class _process_plot_var_args:
     def _makeline(self, axes, x, y, kw, kwargs):
         kw = {**kw, **kwargs}  # Don't modify the original kw.
         self._setdefaults(self._getdefaults(kw), kw)
+
+        _logdt_save_data = kw.pop("_logdt_save_data", False)
         seg = mlines.Line2D(x, y, **kw)
-        _logdt.log_data_to_dir(self.command, axes, x, y, kw, seg)
+
+        if _logdt_save_data:
+            _logdt.log_data_to_dir(self.command, axes, x, y, kw, seg)
+
         return seg, kw
 
     def _makefill(self, axes, x, y, kw, kwargs):

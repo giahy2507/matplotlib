@@ -5,6 +5,15 @@ import pickle
 import numpy as np
 
 
+def is_external_call(call_stack):
+    last_call = call_stack[0]
+    slast_call = call_stack[1]
+    if last_call.filename != slast_call.filename:
+        return True
+    else:
+        return False
+
+
 class NumpyEncoder(json.JSONEncoder):
     """ Special json encoder for numpy types """
     def default(self, obj):
@@ -15,6 +24,7 @@ class NumpyEncoder(json.JSONEncoder):
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
+
 
 
 def log_data_to_dir(mpl_command, axes, x, y, kargs, artist, dir="/tmp/matplotlib/eval"):
