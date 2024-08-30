@@ -1424,6 +1424,28 @@ class Axes(_AxesBase):
         .. plot:: gallery/lines_bars_and_markers/eventplot_demo.py
         """
 
+        # _logdt
+        # ------------
+        if kwargs.get("logging_data", True):
+            new_kwargs = kwargs.copy()
+            new_kwargs["user_command"]  = "eventplot"
+            if orientation == "vertical":
+                x_data = lineoffsets
+                y_data = positions
+            else:
+                x_data = positions
+                y_data = lineoffsets
+            new_kwargs["orientation"] = orientation
+            if linelengths is not None: new_kwargs["linelengths"] = linelengths
+            if linewidths is not None: new_kwargs["linewidths"] = linewidths
+            if colors is not None: new_kwargs["colors"] = colors
+            if alpha is not None: new_kwargs["alpha"] = alpha
+            if linestyles is not None: new_kwargs["linestyles"] = linestyles
+            new_kwargs["mappings"] = {"lineoffsets": "x", "positions": "y"} if orientation == "vertical" else {"lineoffsets": "y", "positions": "x"}
+            _logdt.log_data_to_dir(new_kwargs["user_command"], self, x_data, y_data, new_kwargs, None, dir="/tmp/matplotlib/eval")
+            kwargs["logging_data"] = False
+        # ------------
+
         lineoffsets, linelengths = self._process_unit_info(
                 [("y", lineoffsets), ("y", linelengths)], kwargs)
 
@@ -2523,6 +2545,7 @@ class Axes(_AxesBase):
             if width is not None: new_kwargs["width"] = width
             if bottom is not None: new_kwargs["bottom"] = bottom
             if align: new_kwargs["align"] = align
+            new_kwargs["mappings"] = {"x": "x", "height": "y"}
             _logdt.log_data_to_dir(new_kwargs["user_command"], self, x, height, new_kwargs, None, dir="/tmp/matplotlib/eval")
             kwargs["logging_data"] = False
         # ------------------
@@ -2851,6 +2874,7 @@ class Axes(_AxesBase):
             if height is not None: new_kwargs["height"] = height
             if left is not None: new_kwargs["left"] = left
             if align: new_kwargs["align"] = align
+            new_kwargs["mappings"] = {"y": "y", "width": "x"}
             _logdt.log_data_to_dir(new_kwargs["user_command"], self, width, y, new_kwargs, None, dir="/tmp/matplotlib/eval")
             kwargs["logging_data"] = False
         # ------------------
@@ -3240,14 +3264,31 @@ class Axes(_AxesBase):
             marker_y = heads
             baseline_x = [np.min(locs), np.max(locs)]
             baseline_y = [bottom, bottom]
-
+        
+        # _logdt code
+        # ------------------
+        # kwargs not found, --> logging_data = True
+        new_kwargs = {}
+        new_kwargs["user_command"] = "stem"
+        if linefmt is not None: new_kwargs["linefmt"] = linefmt
+        if markerfmt is not None: new_kwargs["markerfmt"] = markerfmt
+        if basefmt is not None: new_kwargs["basefmt"] = basefmt
+        if bottom is not None: new_kwargs["bottom"] = bottom
+        if label is not None: new_kwargs["label"] = label
+        if orientation is not None: new_kwargs["orientation"] = orientation
+        new_kwargs["mappings"] = {"locs": "y", "heads": "x"} if orientation == "horizontal" else {"locs": "x", "heads": "y"}
+        _logdt.log_data_to_dir(new_kwargs["user_command"], self, marker_x, marker_y, new_kwargs, None, dir="/tmp/matplotlib/eval")
+        # ------------------
+        
         markerline, = self.plot(marker_x, marker_y,
                                 color=markercolor, linestyle=markerstyle,
-                                marker=markermarker, label="_nolegend_")
+                                marker=markermarker, label="_nolegend_", 
+                                **{"logging_data": False}) # _logdt code
 
         baseline, = self.plot(baseline_x, baseline_y,
                               color=basecolor, linestyle=basestyle,
-                              marker=basemarker, label="_nolegend_")
+                              marker=basemarker, label="_nolegend_", 
+                              **{"logging_data": False})  # _logdt code
 
         stem_container = StemContainer((markerline, stemlines, baseline),
                                        label=label)
@@ -5864,6 +5905,7 @@ class Axes(_AxesBase):
             if where is not None: new_kwargs["where"] = where
             if interpolate is not None: new_kwargs["interpolate"] = interpolate
             if step is not None: new_kwargs["step"] = step
+            new_kwargs["mappings"] = {"y1": "y", "x": "x", "y2": "y2"}
             _logdt.log_data_to_dir(new_kwargs["user_command"], self, x, y1, new_kwargs, None, dir="/tmp/matplotlib/eval")
             kwargs["logging_data"] = False
 
@@ -5881,6 +5923,18 @@ class Axes(_AxesBase):
 
     def fill_betweenx(self, y, x1, x2=0, where=None,
                       step=None, interpolate=False, **kwargs):
+        
+        if kwargs.get("logging_data", True):
+            new_kwargs = kwargs.copy()
+            new_kwargs["user_command"] = "fill_betweenx"
+            if x2 is not None: new_kwargs["x2"] = x2
+            if where is not None: new_kwargs["where"] = where
+            if interpolate is not None: new_kwargs["interpolate"] = interpolate
+            if step is not None: new_kwargs["step"] = step
+            new_kwargs["mappings"] = {"y": "y", "x1": "x", "x2": "x2"}
+            _logdt.log_data_to_dir(new_kwargs["user_command"], self, x1, y, new_kwargs, None, dir="/tmp/matplotlib/eval")
+            kwargs["logging_data"] = False
+
         return self._fill_between_x_or_y(
             "y", y, x1, x2,
             where=where, interpolate=interpolate, step=step, **kwargs)
@@ -7493,6 +7547,7 @@ such objects
             if orientation is not None: new_kwargs["orientation"] = orientation
             if baseline is not None: new_kwargs["baseline"] = baseline
             if fill is not None: new_kwargs["fill"] = fill
+            new_kwargs["mappings"] = {"values": "y", "edges": "x"}
             _logdt.log_data_to_dir(new_kwargs["user_command"], self, edges, values, new_kwargs, None, dir="/tmp/matplotlib/eval")
             kwargs["logging_data"] = False
         # ------------------
