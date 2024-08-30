@@ -5,25 +5,19 @@ import pickle
 import numpy as np
 
 
-def is_external_call(call_stack):
-    last_call = call_stack[0]
-    slast_call = call_stack[1]
-    if last_call.filename != slast_call.filename:
-        return True
-    else:
-        return False
-
-
 class NumpyEncoder(json.JSONEncoder):
     """ Special json encoder for numpy types """
     def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        elif isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
+        try:
+            if isinstance(obj, np.integer):
+                return int(obj)
+            elif isinstance(obj, np.floating):
+                return float(obj)
+            elif isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return json.JSONEncoder.default(self, obj)
+        except:
+            return str(obj)
 
 
 
@@ -35,7 +29,7 @@ def log_data_to_dir(mpl_command, axes, x, y, kargs, artist, dir="/tmp/matplotlib
     while True:
         filename = os.path.join(command_dir, f"{counter}.json")
         if not os.path.exists(filename):
-            # save original data
+            # save plotting data
             print(f"id(axes): {id(axes)}, {mpl_command}()", kargs)
             print(f"x({type(x)}):", x)
             print(f"y({type(x)}):", y)

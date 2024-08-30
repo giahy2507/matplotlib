@@ -1809,9 +1809,9 @@ class Axes(_AxesBase):
 
         # _logdt code 
         # ------------------
-        if _logdt.is_external_call(inspect.stack()):
-            print("plot(): external call")
-            kwargs["_logdt_save_data"] = True
+        # logging_data code is called in subsequent calls './_base.py - _makeline()' ""
+        if "user_command" not in kwargs:
+            kwargs["user_command"] = "plot"
         # ------------------
 
         # Process the 'data' kwarg.
@@ -1900,6 +1900,19 @@ class Axes(_AxesBase):
         `.AutoDateFormatter` (if the tick formatter is not already set to a
         `.DateFormatter` instance).
         """
+        # _logdt code 
+        # ------------------
+        if kwargs.get("logging_data", True):
+            new_kwargs = kwargs.copy()
+            new_kwargs["user_command"]  = "plot_date"
+            if fmt: new_kwargs["fmt"] = fmt
+            if tz: new_kwargs["tz"] = tz
+            if xdate: new_kwargs["xdate"] = xdate
+            if ydate: new_kwargs["ydate"] = ydate
+            _logdt.log_data_to_dir(new_kwargs["user_command"], self, x, y, new_kwargs, None, dir="/tmp/matplotlib/eval")
+            kwargs["logging_data"] = False
+        # ------------------
+
         if xdate:
             self.xaxis_date(tz)
         if ydate:
@@ -1949,6 +1962,9 @@ class Axes(_AxesBase):
         list of `.Line2D`
             Objects representing the plotted data.
         """
+        if "user_command" not in kwargs:
+            kwargs["user_command"] = "loglog"
+
         dx = {k: v for k, v in kwargs.items()
               if k in ['base', 'subs', 'nonpositive',
                        'basex', 'subsx', 'nonposx']}
@@ -2000,6 +2016,11 @@ class Axes(_AxesBase):
         list of `.Line2D`
             Objects representing the plotted data.
         """
+
+        # _logdt code
+        if "user_command" not in kwargs:
+            kwargs["user_command"] = "semilogx"
+
         d = {k: v for k, v in kwargs.items()
              if k in ['base', 'subs', 'nonpositive',
                       'basex', 'subsx', 'nonposx']}
@@ -2047,6 +2068,11 @@ class Axes(_AxesBase):
         list of `.Line2D`
             Objects representing the plotted data.
         """
+
+        # _logdt code
+        if "user_command" not in kwargs:
+            kwargs["user_command"] = "semilogx"
+
         d = {k: v for k, v in kwargs.items()
              if k in ['base', 'subs', 'nonpositive',
                       'basey', 'subsy', 'nonposy']}
@@ -2307,6 +2333,12 @@ class Axes(_AxesBase):
         list of `.Line2D`
             Objects representing the plotted data.
         """
+        # _logdt code
+        # ------------------
+        if "user_command" not in kwargs:
+            kwargs["user_command"] = "step"
+        # ------------------
+
         _api.check_in_list(('pre', 'post', 'mid'), where=where)
         kwargs['drawstyle'] = 'steps-' + where
         return self.plot(x, y, *args, data=data, **kwargs)
@@ -2482,6 +2514,19 @@ class Axes(_AxesBase):
         Stacked bars can be achieved by passing individual *bottom* values per
         bar. See :doc:`/gallery/lines_bars_and_markers/bar_stacked`.
         """
+        
+        # _logdt code 
+        # ------------------ 
+        if kwargs.get("logging_data", True):
+            new_kwargs = kwargs.copy()
+            new_kwargs["user_command"]  = "bar"
+            if width is not None: new_kwargs["width"] = width
+            if bottom is not None: new_kwargs["bottom"] = bottom
+            if align: new_kwargs["align"] = align
+            _logdt.log_data_to_dir(new_kwargs["user_command"], self, x, height, new_kwargs, None, dir="/tmp/matplotlib/eval")
+            kwargs["logging_data"] = False
+        # ------------------
+
         kwargs = cbook.normalize_kwargs(kwargs, mpatches.Patch)
         color = kwargs.pop('color', None)
         if color is None:
@@ -2797,7 +2842,20 @@ class Axes(_AxesBase):
         bar. See
         :doc:`/gallery/lines_bars_and_markers/horizontal_barchart_distribution`.
         """
-        kwargs.setdefault('orientation', 'horizontal')
+        # _logdt code 
+        # ------------------
+        logging_data = kwargs.get("logging_data", True)
+        if logging_data:
+            new_kwargs = kwargs.copy()
+            new_kwargs["user_command"]  = "barh"
+            if height is not None: new_kwargs["height"] = height
+            if left is not None: new_kwargs["left"] = left
+            if align: new_kwargs["align"] = align
+            _logdt.log_data_to_dir(new_kwargs["user_command"], self, width, y, new_kwargs, None, dir="/tmp/matplotlib/eval")
+            kwargs["logging_data"] = False
+        # ------------------
+        
+        kwargs.setdefault('orientation', 'horizontal')  
         patches = self.bar(x=left, height=height, width=width, bottom=y,
                            align=align, data=data, **kwargs)
         return patches
@@ -3316,6 +3374,30 @@ class Axes(_AxesBase):
         This method sets the aspect ratio of the axis to "equal".
         The Axes aspect ratio can be controlled with `.Axes.set_aspect`.
         """
+        # _logdt code
+        # ------------------
+        # kwargs not found, --> logging_data = True
+        new_kwargs = {}
+        if explode is not None: new_kwargs["explode"] = explode
+        if labels is not None: new_kwargs["labels"] = labels
+        if colors is not None: new_kwargs["colors"] = colors
+        if autopct is not None: new_kwargs["autopct"] = autopct
+        if pctdistance is not None: new_kwargs["pctdistance"] = pctdistance
+        if shadow is not None: new_kwargs["shadow"] = shadow
+        if labeldistance is not None: new_kwargs["labeldistance"] = labeldistance
+        if startangle is not None: new_kwargs["startangle"] = startangle
+        if radius is not None: new_kwargs["radius"] = radius
+        if counterclock is not None: new_kwargs["counterclock"] = counterclock
+        if wedgeprops is not None: new_kwargs["wedgeprops"] = wedgeprops
+        if textprops is not None: new_kwargs["textprops"] = textprops
+        if center is not None: new_kwargs["center"] = center
+        if frame is not None: new_kwargs["frame"] = frame
+        if rotatelabels is not None: new_kwargs["rotatelabels"] = rotatelabels
+        if normalize is not None: new_kwargs["normalize"] = normalize
+        if hatch is not None: new_kwargs["hatch"] = hatch
+        _logdt.log_data_to_dir("pie", self, x, None, new_kwargs, None, dir="/tmp/matplotlib/eval")
+        # ------------------
+
         self.set_aspect('equal')
         # The use of float32 is "historical", but can't be changed without
         # regenerating the test baselines.
@@ -3617,6 +3699,28 @@ class Axes(_AxesBase):
 
             %(Line2D:kwdoc)s
         """
+        # _logdt code
+        # ------------------ 
+        if kwargs.get("logging_data", True):
+            new_kwargs = kwargs.copy()
+            if yerr is not None: new_kwargs["yerr"] = yerr
+            if xerr is not None: new_kwargs["xerr"] = xerr
+            if fmt is not None: new_kwargs["fmt"] = fmt
+            if ecolor is not None: new_kwargs["ecolor"] = ecolor
+            if elinewidth is not None: new_kwargs["elinewidth"] = elinewidth
+            if capsize is not None: new_kwargs["capsize"] = capsize
+            if barsabove is not None: new_kwargs["barsabove"] = barsabove
+            if lolims is not None: new_kwargs["lolims"] = lolims
+            if uplims is not None: new_kwargs["uplims"] = uplims
+            if xlolims is not None: new_kwargs["xlolims"] = xlolims
+            if xuplims is not None: new_kwargs["xuplims"] = xuplims
+            if errorevery is not None: new_kwargs["errorevery"] = errorevery
+            if capthick is not None: new_kwargs["capthick"] = capthick
+            _logdt.log_data_to_dir("errorbar", self, x, y, new_kwargs, None, dir="/tmp/matplotlib/eval")
+            kwargs["logging_data"] = False
+        # ------------------
+
+
         kwargs = cbook.normalize_kwargs(kwargs, mlines.Line2D)
         # Drop anything that comes in as None to use the default instead.
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
@@ -4856,6 +4960,25 @@ class Axes(_AxesBase):
           size matches the size of *x* and *y*.
 
         """
+        # _logdt code 
+        # ------------------
+        if kwargs.get("logging_data", True):
+            new_kwargs = kwargs.copy()
+            if s is not None: new_kwargs["s"] = s
+            if c is not None: new_kwargs["c"] = c
+            if marker is not None: new_kwargs["marker"] = marker
+            if cmap is not None: new_kwargs["cmap"] = cmap
+            if norm is not None: new_kwargs["norm"] = norm
+            if vmin is not None: new_kwargs["vmin"] = vmin
+            if vmax is not None: new_kwargs["vmax"] = vmax
+            if alpha is not None: new_kwargs["alpha"] = alpha
+            if linewidths is not None: new_kwargs["linewidths"] = linewidths
+            if edgecolors is not None: new_kwargs["edgecolors"] = edgecolors
+            if plotnonfinite is not None: new_kwargs["plotnonfinite"] = plotnonfinite
+            _logdt.log_data_to_dir("scatter", self, x, y, new_kwargs, None, dir="/tmp/matplotlib/eval")
+            kwargs["logging_data"] = False
+        # ------------------
+
         # add edgecolors and linewidths to kwargs so they
         # can be processed by normailze_kwargs
         if edgecolors is not None:
@@ -5733,6 +5856,17 @@ class Axes(_AxesBase):
 
     def fill_between(self, x, y1, y2=0, where=None, interpolate=False,
                      step=None, **kwargs):
+        
+        if kwargs.get("logging_data", True):
+            new_kwargs = kwargs.copy()
+            new_kwargs["user_command"] = "fill_between"
+            if y2 is not None: new_kwargs["y2"] = y2
+            if where is not None: new_kwargs["where"] = where
+            if interpolate is not None: new_kwargs["interpolate"] = interpolate
+            if step is not None: new_kwargs["step"] = step
+            _logdt.log_data_to_dir(new_kwargs["user_command"], self, x, y1, new_kwargs, None, dir="/tmp/matplotlib/eval")
+            kwargs["logging_data"] = False
+
         return self._fill_between_x_or_y(
             "x", x, y1, y2,
             where=where, interpolate=interpolate, step=step, **kwargs)
@@ -7351,6 +7485,17 @@ such objects
             `~matplotlib.patches.StepPatch` properties
 
         """
+        # _logdt code
+        # ------------------
+        if "user_command" not in kwargs:
+            new_kwargs = kwargs.copy()
+            new_kwargs["user_command"] = "stairs"
+            if orientation is not None: new_kwargs["orientation"] = orientation
+            if baseline is not None: new_kwargs["baseline"] = baseline
+            if fill is not None: new_kwargs["fill"] = fill
+            _logdt.log_data_to_dir(new_kwargs["user_command"], self, edges, values, new_kwargs, None, dir="/tmp/matplotlib/eval")
+            kwargs["logging_data"] = False
+        # ------------------
 
         if 'color' in kwargs:
             _color = kwargs.pop('color')

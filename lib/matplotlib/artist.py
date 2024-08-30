@@ -1390,6 +1390,28 @@ class Artist:
 
     mouseover = property(get_mouseover, set_mouseover)  # backcompat.
 
+    def set_logging_data(self, logging_data):
+        """
+        logdt ---
+        Allowing to log data in "/tmp/matplotlib/eval" or not.
+        This attribute is only to make the Artist executable
+        Parameters
+        ----------
+        logging_data : bool
+        """
+        self.logging_data = logging_data
+
+    def set_user_command(self, user_command):
+        """
+        logdt ---
+        User command to be executed. "plot", "scatter"
+        
+        Parameters
+        ----------
+        user_command : str
+        """
+        self.user_command = user_command
+    
 
 def _get_tightbbox_for_layout_only(obj, *args, **kwargs):
     """

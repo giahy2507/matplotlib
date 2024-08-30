@@ -349,13 +349,11 @@ class _process_plot_var_args:
     def _makeline(self, axes, x, y, kw, kwargs):
         kw = {**kw, **kwargs}  # Don't modify the original kw.
         self._setdefaults(self._getdefaults(kw), kw)
-
-        _logdt_save_data = kw.pop("_logdt_save_data", False)
         seg = mlines.Line2D(x, y, **kw)
-
-        if _logdt_save_data:
-            _logdt.log_data_to_dir(self.command, axes, x, y, kw, seg)
-
+        # _logdt
+        user_command = kwargs.get("user_command", self.command)
+        if kwargs.get("logging_data", True):
+            _logdt.log_data_to_dir(user_command, axes, x, y, kw, seg)
         return seg, kw
 
     def _makefill(self, axes, x, y, kw, kwargs):
