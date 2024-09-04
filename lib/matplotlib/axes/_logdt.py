@@ -21,7 +21,7 @@ class NumpyEncoder(json.JSONEncoder):
 
 
 
-def log_data_to_dir(mpl_command, axes, x, y, kargs, artist, dir="/tmp/matplotlib/eval"):
+def log_data_to_dir(mpl_command, axes, x, y, kargs, dir="/tmp/matplotlib/eval"):
     command_dir = os.path.join(dir, mpl_command)
     os.makedirs(command_dir, exist_ok=True)
 
@@ -41,11 +41,5 @@ def log_data_to_dir(mpl_command, axes, x, y, kargs, artist, dir="/tmp/matplotlib
                     "y": y,
                     "kargs": kargs
                 }, f, indent=4, ensure_ascii=False, cls=NumpyEncoder)
-
-            # save artist
-            artist_filename = os.path.join(command_dir, f"{counter}_artist.pickle")
-            with open(artist_filename, "wb") as f:
-                pickle.dump(artist, f)
-            
             break
         counter += 1
