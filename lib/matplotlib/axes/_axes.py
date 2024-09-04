@@ -7224,18 +7224,18 @@ such objects
             new_kwargs["user_command"]  = "hist"
             if bins is not None: new_kwargs["bins"] = bins
             if range is not None: new_kwargs["range"] = range
-            if density is not False: new_kwargs["density"] = density
+            if density is not None: new_kwargs["density"] = density
             if weights is not None: new_kwargs["weights"] = weights
-            if cumulative is not False: new_kwargs["cumulative"] = cumulative
+            if cumulative is not None: new_kwargs["cumulative"] = cumulative
             if bottom is not None: new_kwargs["bottom"] = bottom
-            if histtype is not "bar": new_kwargs["histtype"] = histtype
-            if align is not "mid": new_kwargs["align"] = align
-            if orientation is not "vertical": new_kwargs["orientation"] = orientation
+            if histtype is not None: new_kwargs["histtype"] = histtype
+            if align is not None: new_kwargs["align"] = align
+            if orientation is not None: new_kwargs["orientation"] = orientation
             if rwidth is not None: new_kwargs["rwidth"] = rwidth
-            if log is not False: new_kwargs["log"] = log
+            if log is not None: new_kwargs["log"] = log
             if color is not None: new_kwargs["color"] = color
             if label is not None: new_kwargs["label"] = label
-            if stacked is not False: new_kwargs["stacked"] = stacked
+            if stacked is not None: new_kwargs["stacked"] = stacked
             new_kwargs["mappings"]  = {"x": "x", "y": None}
             _logdt.log_data_to_dir(new_kwargs["user_command"], self, 
                                    x, None, new_kwargs,
