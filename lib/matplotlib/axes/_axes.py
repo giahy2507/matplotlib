@@ -2523,7 +2523,9 @@ class Axes(_AxesBase):
             if width is not None: new_kwargs["width"] = width
             if bottom is not None: new_kwargs["bottom"] = bottom
             if align: new_kwargs["align"] = align
-            _logdt.log_data_to_dir(new_kwargs["user_command"], self, x, height, new_kwargs, None, dir="/tmp/matplotlib/eval")
+            _logdt.log_data_to_dir(new_kwargs["user_command"], 
+                                   self, x, height, new_kwargs, None, 
+                                   dir="/tmp/matplotlib/eval")
             kwargs["logging_data"] = False
         # ------------------
 
@@ -7142,6 +7144,31 @@ such objects
         # Avoid shadowing the builtin.
         bin_range = range
         from builtins import range
+
+        # _logdt code 
+        # ------------------ 
+        if kwargs.get("logging_data", True):
+            new_kwargs = kwargs.copy()
+            new_kwargs["user_command"]  = "hist"
+            if bins is not None: new_kwargs["bins"] = bins
+            if range is not None: new_kwargs["range"] = range
+            if density is not False: new_kwargs["density"] = density
+            if weights is not None: new_kwargs["weights"] = weights
+            if cumulative is not False: new_kwargs["cumulative"] = cumulative
+            if bottom is not None: new_kwargs["bottom"] = bottom
+            if histtype is not "bar": new_kwargs["histtype"] = histtype
+            if align is not "mid": new_kwargs["align"] = align
+            if orientation is not "vertical": new_kwargs["orientation"] = orientation
+            if rwidth is not None: new_kwargs["rwidth"] = rwidth
+            if log is not False: new_kwargs["log"] = log
+            if color is not None: new_kwargs["color"] = color
+            if label is not None: new_kwargs["label"] = label
+            if stacked is not False: new_kwargs["stacked"] = stacked
+            _logdt.log_data_to_dir(new_kwargs["user_command"], 
+                                   self, x, None, new_kwargs, None, 
+                                   dir="/tmp/matplotlib/eval")
+            kwargs["logging_data"] = False
+        # ------------------
 
         if np.isscalar(x):
             x = [x]
