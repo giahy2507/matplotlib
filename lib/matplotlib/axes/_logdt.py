@@ -18,6 +18,8 @@ class NumpyEncoder(json.JSONEncoder):
                 return obj.tolist()
             elif isinstance(obj, pd.Series):
                 return obj.tolist()
+            elif isinstance(obj, pd.Index):
+                return obj.tolist()
             return json.JSONEncoder.default(self, obj)
         except:
             return str(obj)
@@ -36,10 +38,10 @@ def log_data_to_dir(mpl_command, axes, x, y, kargs, dir="/tmp/matplotlib/eval"):
         filename = os.path.join(command_dir, f"{counter}.json")
         if not os.path.exists(filename):
             # save plotting data
-            print(f"id(axes): {id(axes)}, {mpl_command}()", kargs)
-            print(f"x({type(x)}):", list(x))
-            print(f"y({type(x)}):", list(y))
-            print()
+            # print(f"id(axes): {id(axes)}, {mpl_command}()", kargs)
+            # print(f"x({type(x)}):", x)
+            # print(f"y({type(x)}):", y)
+            # print()
             with open(filename, "w", encoding="utf-8") as f:
                 json.dump({
                     "axes_id": id(axes),
