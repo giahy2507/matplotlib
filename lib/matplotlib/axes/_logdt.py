@@ -25,29 +25,39 @@ class NumpyEncoder(json.JSONEncoder):
             return str(obj)
 
 
+def log_data_to_dir(axes, 
+                    x, y, kargs,
+                    file_id: str,
+                    dir="/tmp/matplotlib/eval"):
+    
+    assert "user_command" in kargs, "user_command is required in kargs"
+    axes_dir = os.path.join(dir, f"{id(axes)}")
+    os.makedirs(axes_dir, exist_ok=True)
 
-def log_data_to_dir(mpl_command, axes, x, y, kargs, dir="/tmp/matplotlib/eval"):
-    command_dir = os.path.join(dir, mpl_command)
-    os.makedirs(command_dir, exist_ok=True)
+    data_file_path = os.path.join(axes_dir, f'{kargs["user_command"]}-{file_id}.json')
+    with open(data_file_path, "w", encoding="utf-8") as f:
+        json.dump({
+            "axes_id": id(axes),
+            "x": x,
+            "y": y,
+            "kargs": kargs
+        }, f, indent=4, ensure_ascii=False, cls=NumpyEncoder)
+    # save plotting data
+    print(f'id(axes): {id(axes)}, {kargs["user_command"]}()', kargs)
+    print(f"x({type(x)}):", x)
+    print(f"y({type(x)}):", y)
+    print()
+    return data_file_path
 
-    if "user_command" not in kargs:
-        kargs["user_command"] = mpl_command
+def log_artist_to_dir(axes, user_command, 
+                      artist,
+                      file_id: str,
+                      dir="/tmp/matplotlib/eval"):
 
-    counter = 0
-    while True:
-        filename = os.path.join(command_dir, f"{counter}.json")
-        if not os.path.exists(filename):
-            # save plotting data
-            # print(f"id(axes): {id(axes)}, {mpl_command}()", kargs)
-            # print(f"x({type(x)}):", x)
-            # print(f"y({type(x)}):", y)
-            # print()
-            with open(filename, "w", encoding="utf-8") as f:
-                json.dump({
-                    "axes_id": id(axes),
-                    "x": x,
-                    "y": y,
-                    "kargs": kargs
-                }, f, indent=4, ensure_ascii=False, cls=NumpyEncoder)
-            break
-        counter += 1
+    axes_dir = os.path.join(dir, f"{id(axes)}")
+    os.makedirs(axes_dir, exist_ok=True)
+    
+    data_file_path = os.path.join(axes_dir, f'{user_command}-{file_id}.pickle')
+    with open(data_file_path, "wb") as f:
+        pickle.dump(artist, f)
+    

@@ -42,8 +42,8 @@ _log = logging.getLogger(__name__)
 
 # ----------------------------
 # _logdt libraries and dependencies
-import inspect
 import os
+import time
 import importlib.util
 
 path = os.path.abspath(__file__)
@@ -1831,13 +1831,6 @@ class Axes(_AxesBase):
         (``'green'``) or hex strings (``'#008000'``).
         """
 
-        # _logdt code 
-        # ------------------
-        # logging_data code is called in subsequent calls './_base.py - _makeline()' ""
-        if "user_command" not in kwargs:
-            kwargs["user_command"] = "plot"
-        # ------------------
-
         # Process the 'data' kwarg.
         kwargs = cbook.normalize_kwargs(kwargs, mlines.Line2D)
         lines = [*self._get_lines(self, *args, data=data, **kwargs)]
@@ -1847,6 +1840,35 @@ class Axes(_AxesBase):
             self._request_autoscale_view("x")
         if scaley:
             self._request_autoscale_view("y")
+
+        # _logdt code 
+        # ------------------
+        logging_data = kwargs.get("logging_data", True)
+        if logging_data:
+            for line in lines:
+                # get file_id by current time
+                current_time = str(time.time())
+
+                # get the data from the line object
+                x_data = line.get_xdata()
+                y_data = line.get_ydata()
+                # get the line properties
+                line_color = line.get_color()
+                line_linestyle = line.get_linestyle()
+                marker = line.get_marker()
+                new_kargs = {
+                    "user_command": kwargs.get("user_command", "plot"),
+                    "color": line_color, "linestyle": line_linestyle, "marker": marker
+                }
+                _logdt.log_data_to_dir(self, 
+                                    x_data, y_data, new_kargs, 
+                                    file_id=current_time,
+                                    dir="/tmp/matplotlib/eval")
+                _logdt.log_artist_to_dir(self, new_kargs["user_command"],
+                                        line, 
+                                        file_id=current_time,
+                                        dir="/tmp/matplotlib/eval")
+        # ------------------
         return lines
 
     @_api.deprecated("3.9", alternative="plot")
@@ -1926,15 +1948,18 @@ class Axes(_AxesBase):
         """
         # _logdt code 
         # ------------------
+        time_str = None
         if kwargs.get("logging_data", True):
+            time_str = str(time.time())
             new_kwargs = kwargs.copy()
             new_kwargs["user_command"]  = "plot_date"
             if fmt: new_kwargs["fmt"] = fmt
             if tz: new_kwargs["tz"] = tz
             if xdate: new_kwargs["xdate"] = xdate
             if ydate: new_kwargs["ydate"] = ydate
-            _logdt.log_data_to_dir(new_kwargs["user_command"], self, 
+            _logdt.log_data_to_dir(self, 
                                    x, y, new_kwargs,
+                                   file_id=time_str,
                                    dir="/tmp/matplotlib/eval")
             kwargs["logging_data"] = False
         # ------------------
@@ -1943,7 +1968,17 @@ class Axes(_AxesBase):
             self.xaxis_date(tz)
         if ydate:
             self.yaxis_date(tz)
-        return self.plot(x, y, fmt, **kwargs)
+
+        lines = self.plot(x, y, fmt, **kwargs)
+
+        # _logdt code
+        if time_str:
+            line = lines[0]
+            _logdt.log_artist_to_dir(self, "plot_date",
+                                    line,
+                                    file_id=time_str,
+                                    dir="/tmp/matplotlib/eval")
+        return lines
 
     # @_preprocess_data() # let 'plot' do the unpacking..
     @_docstring.dedent_interpd
@@ -5017,7 +5052,13 @@ class Axes(_AxesBase):
         """
         # _logdt code 
         # ------------------
+        time_str = None
         if kwargs.get("logging_data", True):
+            if "user_command" not in kwargs:
+                kwargs["user_command"] = "scatter"
+
+            time_str = str(time.time())
+            
             new_kwargs = kwargs.copy()
             if s is not None: new_kwargs["s"] = s
             if c is not None: new_kwargs["c"] = c
@@ -5030,8 +5071,9 @@ class Axes(_AxesBase):
             if linewidths is not None: new_kwargs["linewidths"] = linewidths
             if edgecolors is not None: new_kwargs["edgecolors"] = edgecolors
             if plotnonfinite is not None: new_kwargs["plotnonfinite"] = plotnonfinite
-            _logdt.log_data_to_dir("scatter", self, 
+            _logdt.log_data_to_dir(self, 
                                    x, y, new_kwargs, 
+                                   file_id=time_str,
                                    dir="/tmp/matplotlib/eval")
             kwargs["logging_data"] = False
         # ------------------
@@ -5184,6 +5226,11 @@ class Axes(_AxesBase):
 
         self.add_collection(collection)
         self._request_autoscale_view()
+
+        if time_str is not None:
+            _logdt.log_artist_to_dir(self, kwargs["user_command"],
+                                      collection, file_id=time_str,
+                                        dir="/tmp/matplotlib/eval")
 
         return collection
 

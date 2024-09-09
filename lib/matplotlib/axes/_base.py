@@ -33,22 +33,6 @@ import matplotlib.transforms as mtransforms
 _log = logging.getLogger(__name__)
 
 
-# ----------------------------
-# _logdt libraries and dependencies
-import inspect
-import os
-import importlib.util
-
-path = os.path.abspath(__file__)
-_logdt_path = os.path.join(os.path.dirname(path), "_logdt.py")
-assert os.path.exists(_logdt_path)
-
-spec = importlib.util.spec_from_file_location("_logdt", _logdt_path)
-_logdt = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(_logdt)
-# ----------------------------
-
-
 class _axis_method_wrapper:
     """
     Helper to generate Axes methods wrapping Axis methods.
@@ -350,11 +334,6 @@ class _process_plot_var_args:
         kw = {**kw, **kwargs}  # Don't modify the original kw.
         self._setdefaults(self._getdefaults(kw), kw)
         seg = mlines.Line2D(x, y, **kw)
-        # _logdt
-        user_command = kwargs.get("user_command", self.command)
-        if kwargs.get("logging_data", True):
-            _logdt.log_data_to_dir(user_command, axes, 
-                                   x, y, kw, dir="/tmp/matplotlib/eval")
         return seg, kw
 
     def _makefill(self, axes, x, y, kw, kwargs):
