@@ -20,6 +20,8 @@ class NumpyEncoder(json.JSONEncoder):
                 return obj.tolist()
             elif isinstance(obj, pd.Index):
                 return obj.tolist()
+            elif isinstance(obj, pd.RangeIndex):
+                return obj.tolist()
             return json.JSONEncoder.default(self, obj)
         except:
             return str(obj)

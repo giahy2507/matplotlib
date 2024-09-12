@@ -1950,9 +1950,11 @@ class Axes(_AxesBase):
         # ------------------
         time_str = None
         if kwargs.get("logging_data", True):
+            if "user_command" not in kwargs:
+                kwargs["user_command"] = "plot_date"
+
             time_str = str(time.time())
             new_kwargs = kwargs.copy()
-            new_kwargs["user_command"]  = "plot_date"
             if fmt: new_kwargs["fmt"] = fmt
             if tz: new_kwargs["tz"] = tz
             if xdate: new_kwargs["xdate"] = xdate
@@ -1974,7 +1976,7 @@ class Axes(_AxesBase):
         # _logdt code
         if time_str:
             line = lines[0]
-            _logdt.log_artist_to_dir(self, "plot_date",
+            _logdt.log_artist_to_dir(self, kwargs.get("user_command", "plot_date"),
                                     line,
                                     file_id=time_str,
                                     dir="/tmp/matplotlib/eval")
@@ -2578,15 +2580,21 @@ class Axes(_AxesBase):
         
         # _logdt code 
         # ------------------ 
+        time_str = None
         if kwargs.get("logging_data", True):
+            if "user_command" not in kwargs:
+                kwargs["user_command"] = "bar"
+
+            time_str = str(time.time())
             new_kwargs = kwargs.copy()
-            new_kwargs["user_command"]  = "bar"
             if width is not None: new_kwargs["width"] = width
             if bottom is not None: new_kwargs["bottom"] = bottom
             if align: new_kwargs["align"] = align
-            new_kwargs["mappings"] = {"x": "x", "height": "y"}
-            _logdt.log_data_to_dir(new_kwargs["user_command"], self, 
-                                   x, height, new_kwargs, 
+            new_kwargs["mappings"] = {"x": "x", "y": "height"}
+
+            _logdt.log_data_to_dir(self, 
+                                   x, height, new_kwargs,
+                                   file_id=time_str,
                                    dir="/tmp/matplotlib/eval")
             kwargs["logging_data"] = False
         # ------------------
@@ -2782,6 +2790,14 @@ class Axes(_AxesBase):
             tick_label_axis.set_ticks(tick_label_position)
             tick_label_axis.set_ticklabels(tick_labels)
 
+        # _logdt code
+        # ------------------
+        if time_str:
+            _logdt.log_artist_to_dir(self, kwargs.get("user_command", "bar"),
+                                      bar_container, 
+                                      file_id=time_str,
+                                      dir="/tmp/matplotlib/eval")
+
         return bar_container
 
     # @_preprocess_data() # let 'bar' do the unpacking..
@@ -2908,16 +2924,21 @@ class Axes(_AxesBase):
         """
         # _logdt code 
         # ------------------
-        logging_data = kwargs.get("logging_data", True)
-        if logging_data:
+        time_str = None
+        if kwargs.get("logging_data", True):
+            if "user_command" not in kwargs:
+                kwargs["user_command"] = "barh"
+            
+            time_str = str(time.time())
             new_kwargs = kwargs.copy()
-            new_kwargs["user_command"]  = "barh"
-            if height is not None: new_kwargs["height"] = height
-            if left is not None: new_kwargs["left"] = left
+            if height: new_kwargs["height"] = height
+            if left: new_kwargs["left"] = left
             if align: new_kwargs["align"] = align
-            new_kwargs["mappings"] = {"y": "y", "width": "x"}
-            _logdt.log_data_to_dir(new_kwargs["user_command"], self, 
-                                   width, y, new_kwargs, 
+            new_kwargs["mappings"] = {"x": "width", "y": "y"}
+
+            _logdt.log_data_to_dir(self, 
+                                   width, y, new_kwargs,
+                                   file_id=time_str,
                                    dir="/tmp/matplotlib/eval")
             kwargs["logging_data"] = False
         # ------------------
@@ -2925,6 +2946,11 @@ class Axes(_AxesBase):
         kwargs.setdefault('orientation', 'horizontal')  
         patches = self.bar(x=left, height=height, width=width, bottom=y,
                            align=align, data=data, **kwargs)
+        if time_str:
+            _logdt.log_artist_to_dir(self, kwargs.get("user_command", "barh"),
+                                     patches,
+                                     file_id=time_str,
+                                     dir="/tmp/matplotlib/eval")
         return patches
 
     def bar_label(self, container, labels=None, *, fmt="%g", label_type="edge",
@@ -3463,26 +3489,29 @@ class Axes(_AxesBase):
         # _logdt code
         # ------------------
         # kwargs not found, --> logging_data = True
+        time_str = str(time.time())
         new_kwargs = {}
-        if explode is not None: new_kwargs["explode"] = explode
-        if labels is not None: new_kwargs["labels"] = labels
-        if colors is not None: new_kwargs["colors"] = colors
-        if autopct is not None: new_kwargs["autopct"] = autopct
-        if pctdistance is not None: new_kwargs["pctdistance"] = pctdistance
-        if shadow is not None: new_kwargs["shadow"] = shadow
-        if labeldistance is not None: new_kwargs["labeldistance"] = labeldistance
-        if startangle is not None: new_kwargs["startangle"] = startangle
-        if radius is not None: new_kwargs["radius"] = radius
-        if counterclock is not None: new_kwargs["counterclock"] = counterclock
-        if wedgeprops is not None: new_kwargs["wedgeprops"] = wedgeprops
-        if textprops is not None: new_kwargs["textprops"] = textprops
-        if center is not None: new_kwargs["center"] = center
-        if frame is not None: new_kwargs["frame"] = frame
-        if rotatelabels is not None: new_kwargs["rotatelabels"] = rotatelabels
-        if normalize is not None: new_kwargs["normalize"] = normalize
-        if hatch is not None: new_kwargs["hatch"] = hatch
-        _logdt.log_data_to_dir("pie", self, 
+        new_kwargs["user_command"] = "pie"
+        if explode: new_kwargs["explode"] = explode
+        if labels : new_kwargs["labels"] = labels
+        if colors : new_kwargs["colors"] = colors
+        if autopct : new_kwargs["autopct"] = autopct
+        if pctdistance : new_kwargs["pctdistance"] = pctdistance
+        if shadow : new_kwargs["shadow"] = shadow
+        if labeldistance : new_kwargs["labeldistance"] = labeldistance
+        if startangle : new_kwargs["startangle"] = startangle
+        if radius : new_kwargs["radius"] = radius
+        if counterclock : new_kwargs["counterclock"] = counterclock
+        if wedgeprops : new_kwargs["wedgeprops"] = wedgeprops
+        if textprops : new_kwargs["textprops"] = textprops
+        if center : new_kwargs["center"] = center
+        if frame : new_kwargs["frame"] = frame
+        if rotatelabels : new_kwargs["rotatelabels"] = rotatelabels
+        if normalize : new_kwargs["normalize"] = normalize
+        if hatch : new_kwargs["hatch"] = hatch
+        _logdt.log_data_to_dir(self, 
                                x, None, new_kwargs,
+                               file_id=time_str,
                                dir="/tmp/matplotlib/eval")
         # ------------------
 
@@ -3610,8 +3639,16 @@ class Axes(_AxesBase):
                      ylim=(-1.25 + center[1], 1.25 + center[1]))
 
         if autopct is None:
+            _logdt.log_artist_to_dir(self, "pie",
+                                      (slices, texts, None), 
+                                      file_id=time_str,
+                                      dir="/tmp/matplotlib/eval")
             return slices, texts
         else:
+            _logdt.log_artist_to_dir(self, "pie",
+                                      (slices, texts, autotexts), 
+                                      file_id=time_str,
+                                      dir="/tmp/matplotlib/eval")
             return slices, texts, autotexts
 
     @staticmethod
@@ -7266,9 +7303,13 @@ such objects
 
         # _logdt code 
         # ------------------ 
+        time_str = None
         if kwargs.get("logging_data", True):
+            if "user_command" not in kwargs:
+                kwargs["user_command"] = "hist"
+            
+            time_str = str(time.time())
             new_kwargs = kwargs.copy()
-            new_kwargs["user_command"]  = "hist"
             if bins is not None: new_kwargs["bins"] = bins
             if range is not None: new_kwargs["range"] = range
             if density is not None: new_kwargs["density"] = density
@@ -7284,8 +7325,9 @@ such objects
             if label is not None: new_kwargs["label"] = label
             if stacked is not None: new_kwargs["stacked"] = stacked
             new_kwargs["mappings"]  = {"x": "x", "y": None}
-            _logdt.log_data_to_dir(new_kwargs["user_command"], self, 
+            _logdt.log_data_to_dir(self,  
                                    x, None, new_kwargs,
+                                   file_id=time_str,
                                    dir="/tmp/matplotlib/eval")
             kwargs["logging_data"] = False
         # ------------------
@@ -7575,10 +7617,21 @@ such objects
                 p.set_label('_nolegend_')
 
         if nx == 1:
+            if time_str:
+                _logdt.log_artist_to_dir(self, kwargs.get("user_command", "hist"),
+                                        (tops[0], bins, patches[0]), 
+                                        file_id=time_str,
+                                        dir="/tmp/matplotlib/eval")
+            
             return tops[0], bins, patches[0]
         else:
             patch_type = ("BarContainer" if histtype.startswith("bar")
                           else "list[Polygon]")
+            if time_str:
+                _logdt.log_artist_to_dir(self, kwargs.get("user_command", "hist"),
+                                        (tops, bins, cbook.silent_list(patch_type, patches)), 
+                                        file_id=time_str,
+                                        dir="/tmp/matplotlib/eval")
             return tops, bins, cbook.silent_list(patch_type, patches)
 
     @_preprocess_data()
