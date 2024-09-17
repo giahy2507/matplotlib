@@ -5998,18 +5998,18 @@ class Axes(_AxesBase):
     def fill_between(self, x, y1, y2=0, where=None, interpolate=False,
                      step=None, **kwargs):
         
-        if kwargs.get("logging_data", True):
-            new_kwargs = kwargs.copy()
-            new_kwargs["user_command"] = "fill_between"
-            if y2 is not None: new_kwargs["y2"] = y2
-            if where is not None: new_kwargs["where"] = where
-            if interpolate is not None: new_kwargs["interpolate"] = interpolate
-            if step is not None: new_kwargs["step"] = step
-            new_kwargs["mappings"] = {"y1": "y", "x": "x", "y2": "y2"}
-            _logdt.log_data_to_dir(new_kwargs["user_command"], self, 
-                                   x, y1, new_kwargs, 
-                                   dir="/tmp/matplotlib/eval")
-            kwargs["logging_data"] = False
+        # if kwargs.get("logging_data", True):
+        #     new_kwargs = kwargs.copy()
+        #     new_kwargs["user_command"] = "fill_between"
+        #     if y2 is not None: new_kwargs["y2"] = y2
+        #     if where is not None: new_kwargs["where"] = where
+        #     if interpolate is not None: new_kwargs["interpolate"] = interpolate
+        #     if step is not None: new_kwargs["step"] = step
+        #     new_kwargs["mappings"] = {"y1": "y", "x": "x", "y2": "y2"}
+        #     _logdt.log_data_to_dir(new_kwargs["user_command"], self, 
+        #                            x, y1, new_kwargs, 
+        #                            dir="/tmp/matplotlib/eval")
+        #     kwargs["logging_data"] = False
 
         return self._fill_between_x_or_y(
             "x", x, y1, y2,

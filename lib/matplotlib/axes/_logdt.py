@@ -22,6 +22,8 @@ class NumpyEncoder(json.JSONEncoder):
                 return obj.tolist()
             elif isinstance(obj, pd.RangeIndex):
                 return obj.tolist()
+            elif isinstance(obj, range):
+                return list(obj)
             return json.JSONEncoder.default(self, obj)
         except:
             return str(obj)
@@ -44,11 +46,11 @@ def log_data_to_dir(axes,
             "y": y,
             "kargs": kargs
         }, f, indent=4, ensure_ascii=False, cls=NumpyEncoder)
-    # save plotting data
-    print(f'id(axes): {id(axes)}, {kargs["user_command"]}()', kargs)
-    print(f"x({type(x)}):", x)
-    print(f"y({type(x)}):", y)
-    print()
+    # # save plotting data
+    # print(f'id(axes): {id(axes)}, {kargs["user_command"]}()', kargs)
+    # print(f"x({type(x)}):", x)
+    # print(f"y({type(x)}):", y)
+    # print()
     return data_file_path
 
 def log_artist_to_dir(axes, user_command, 
